@@ -10,10 +10,16 @@ const TransferModal = props => {
   const { kitty, accountPair, setStatus } = props;
   const [open, setOpen] = React.useState(false);
   const [formValue, setFormValue] = React.useState({});
+  const [transferStatus, setTransferStatus] = React.useState(true);
 
   const formChange = key => (ev, el) => {
     /* TODO: 加代码 */
-    setFormValue(el.value);
+    if (el.value != "") {
+      setFormValue(el.value);
+      setTransferStatus(false);
+    } else {
+      setTransferStatus(true);
+    }
   };
 
   const confirmAndClose = (unsub) => {
@@ -27,12 +33,13 @@ const TransferModal = props => {
       <Modal.Header>毛孩转让</Modal.Header>
       <Modal.Content><Form>
         <Form.Input fluid label='毛孩 ID' readOnly value={kitty.id}/>
-        <Form.Input fluid label='转让对象' placeholder='对方地址' onChange={(_, { value }) => setFormValue(value)}/>
+        <Form.Input fluid label='转让对象' placeholder='对方地址' onChange={formChange(formValue)}/>
       </Form></Modal.Content>
       <Modal.Actions>
         <Button basic color='grey' onClick={() => setOpen(false)}>取消</Button>
         <TxButton
           accountPair={accountPair} label='确认转让' type='SIGNED-TX' setStatus={setStatus}
+          disabled={transferStatus}
           onClick={confirmAndClose}
           attrs={{
             palletRpc: 'kittiesModule',
@@ -44,7 +51,7 @@ const TransferModal = props => {
       </Modal.Actions>
     </Modal>;
   }else{
-      return null;
+    return null;
   }
 };
 
@@ -53,7 +60,22 @@ const KittyProperty = props =>{
   const {kitty, accountPair, setStatus} = props;
   if (kitty.owner == accountPair.address) {
     return (
-      <Label style={{backgroundColor:'green'}}>我的</Label>
+      <Card.Content textAlign='center'>
+        <Label style={{backgroundColor:'green'}}>我的</Label>
+      </Card.Content> 
+    )
+  }else {
+    return null;
+  }
+}
+
+const KittyTransfer = props =>{
+  const {kitty, accountPair, setStatus} = props;
+  if (kitty.owner == accountPair.address) {
+    return (
+      <Card.Content extra textAlign='center'>
+        <TransferModal kitty={kitty} accountPair={accountPair} setStatus={setStatus}/>
+      </Card.Content> 
     )
   }else {
     return null;
@@ -73,9 +95,7 @@ const KittyCard = props => {
   console.log(kitty.dna)
   return (
     <Card>
-      <Card.Content textAlign='center'>
-        <KittyProperty kitty={kitty} accountPair={accountPair} setStatus={setStatus} />
-      </Card.Content>
+      <KittyProperty kitty={kitty} accountPair={accountPair} setStatus={setStatus}/>
       <Card.Content>        
         <KittyAvatar dna={kitty.dna}/>
         <Card.Header>ID号：{kitty.id}</Card.Header>
@@ -83,9 +103,7 @@ const KittyCard = props => {
         <span style={{ overflowWrap: 'break-word' }}>猫奴：{kitty.owner}</span>
         <br/>
       </Card.Content>
-      <Card.Content extra>
-        <TransferModal kitty={kitty} accountPair={accountPair} setStatus={setStatus}/>
-      </Card.Content>
+      <KittyTransfer kitty={kitty} accountPair={accountPair} setStatus={setStatus}/>
     </Card>
   );
 };
@@ -101,7 +119,7 @@ const KittyCards = props => {
         {
           kitties.map(item => {
             return (
-              <Grid.Column width={5}>
+              <Grid.Column width={5} key={item.id}>
                 <KittyCard kitty={item} accountPair={accountPair} setStatus={setStatus} />
               </Grid.Column>
             )
