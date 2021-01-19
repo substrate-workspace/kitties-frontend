@@ -16,11 +16,6 @@ export default function Kitties (props) {
   const [kittyPrices, setKittyPrices] = useState([]);
   const [kitties, setKitties] = useState([]);
   const [status, setStatus] = useState('');
-  const [kittiesTimer, setKittiesTimer] = useState(0);
-
-  const timer = () => {
-    setKittiesTimer(time => time + 1);
-  };
 
   const fetchKittyCnt = () => {
     /* TODO: 加代码，从 substrate 端读取数据过来 */
@@ -66,14 +61,9 @@ export default function Kitties (props) {
     /* TODO: 加代码，从 substrate 端读取数据过来 */
   };
 
-  useEffect(fetchKittyCnt, [api, keyring, timer]);
-  useEffect(fetchKitties, [api, kittyCnt, kittyOwners]);
+  useEffect(fetchKittyCnt, [api, keyring]);
+  useEffect(fetchKitties, [api, kittyCnt]);
   useEffect(populateKitties, [kittyDNAs, kittyOwners]);
-
-  useEffect(() => {
-    const id = setInterval(timer, 1000);
-    return () => clearInterval(id);
-  }, []);
 
   return <Grid.Column width={16}>
     <h1>小毛孩</h1>

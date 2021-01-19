@@ -14,6 +14,8 @@ const TransferModal = props => {
 
   const formChange = key => (ev, el) => {
     /* TODO: 加代码 */
+    console.log("ev: ", ev);
+    console.log("el: ", el);
     if (el.value != "") {
       setFormValue(el.value);
       setTransferStatus(false);
@@ -33,7 +35,14 @@ const TransferModal = props => {
       <Modal.Header>毛孩转让</Modal.Header>
       <Modal.Content><Form>
         <Form.Input fluid label='毛孩 ID' readOnly value={kitty.id}/>
-        <Form.Input fluid label='转让对象' placeholder='对方地址' onChange={formChange(formValue)}/>
+        <Form.Input fluid label='转让对象' placeholder='对方地址' onChange={(_, value) => {
+          if (value != "") {
+            setTransferStatus(false);
+          } else {
+            setTransferStatus(true);
+          }
+          setFormValue(value);
+        }} />
       </Form></Modal.Content>
       <Modal.Actions>
         <Button basic color='grey' onClick={() => setOpen(false)}>取消</Button>
